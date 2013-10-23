@@ -8,6 +8,7 @@ class Celda
 {
 	public:		
 		int material;
+		bool visible;
 		Celda();
 		Celda(int n);
 		std::string getMaterial();		
@@ -18,6 +19,7 @@ Celda::Celda()
 {
 	int num = rand() % (MAXMATERIALES-ESPECIALESMAT) + ESPECIALESMAT;
 	material = num;
+	visible = true;
 }
 
 //Sirve para construir un material AD-HOC

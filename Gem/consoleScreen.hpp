@@ -16,5 +16,5 @@ void print_map()
 		linea.clear();
 	}
 	int i;
-	std::cin >> i;
+	//std::cin >> i;
 }
