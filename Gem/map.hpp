@@ -12,6 +12,7 @@ class Map
 	public:
 		Map();				
 		std::string getCeldaStr(int posX, int posY);
+		int getCeldaID(int posX, int posY);
 };
 
 
@@ -49,4 +50,9 @@ Map::Map()
 std::string Map::getCeldaStr(int posX, int posY)
 {	
 	return grid[posX][posY]->getMaterial();	
+}
+
+int Map::getCeldaID(int posX, int posY)
+{
+	return grid[posX][posY]->getMaterialID();
 }

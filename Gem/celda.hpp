@@ -11,7 +11,8 @@ class Celda
 		bool visible;
 		Celda();
 		Celda(int n);
-		std::string getMaterial();		
+		std::string getMaterial();
+		int getMaterialID();
 };
 
 //Este es el constructor estandar, que construye cualquier tipo de material salvo los ESPECIALES
@@ -32,4 +33,9 @@ Celda::Celda(int n)
 std::string Celda::getMaterial()
 {
 	return getShort(material);
+}
+
+int Celda::getMaterialID()
+{
+	return material;
 }
