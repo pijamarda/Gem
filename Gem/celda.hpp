@@ -9,16 +9,26 @@ class Celda
 	public:		
 		int material;
 		bool visible;
+		int posTx;
+		int posTy;
 		Celda();
 		Celda(int n);
 		std::string getMaterial();
 		int getMaterialID();
+		int getMaterialTPx();
+		int getMaterialTPy();
+		void setAire();
+		
 };
 
 //Este es el constructor estandar, que construye cualquier tipo de material salvo los ESPECIALES
 Celda::Celda()
 {
-	int num = rand() % (MAXMATERIALES-ESPECIALESMAT) + ESPECIALESMAT;
+	int num = 0;
+	//while ((num = rand() % (MAXMATERIALES-ESPECIALESMAT) + ESPECIALESMAT) == 6)
+	num = rand() % (MAXMATERIALES-ESPECIALESMAT) + ESPECIALESMAT;
+	while (num == 6)
+		num = rand() % (MAXMATERIALES-ESPECIALESMAT) + ESPECIALESMAT;
 	material = num;
 	visible = true;
 }
@@ -38,4 +48,19 @@ std::string Celda::getMaterial()
 int Celda::getMaterialID()
 {
 	return material;
+}
+
+int Celda::getMaterialTPx()
+{
+	return postx(material);
+}
+
+int Celda::getMaterialTPy()
+{
+	return posty(material);
+}
+
+void Celda::setAire()
+{
+	this->material = 1;
 }

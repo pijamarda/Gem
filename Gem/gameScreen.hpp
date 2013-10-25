@@ -1,42 +1,33 @@
-#include "tilemap.hpp"
 
 int gameWindow()
 {
     // create the window
     sf::RenderWindow window(sf::VideoMode(WINDOWWIDTH, WINDOWHEIGHT), "Tilemap");
 
-	Map* mapa = new Map();
+	Map* mapa1 = new Map();
+	Map* mapaActual=mapa1;
 
-    // define the level with an array of tile indices
-    int level[MAXHEIGHT*MAXWIDTH];
+	int level1[MAXWIDTH][MAXHEIGHT];
+
 	int contador = 0;
-	for (int j=0; j<MAXWIDTH; j++)
+	for (int j=0; j<MAXHEIGHT; j++)
 	{
-		for (int i=0; i<MAXHEIGHT; i++)
+		for (int i=0; i<MAXWIDTH; i++)
 		{
-			level[contador]=mapa->getCeldaID(i,j);
-			contador++;
-			if (j > 5)
+			
+			level1[i][j] = mapaActual->getCeldaID(i,j);
+			if (j > 14)
 				std::cout<<std::endl;
 		}
 	}
-	/*=
-    {
-        0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-        0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0,
-        1, 1, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 3, 3, 3,
-        0, 1, 0, 0, 2, 0, 3, 3, 3, 0, 1, 1, 1, 0, 0, 0,
-        0, 1, 1, 0, 4, 3, 3, 0, 0, 0, 1, 1, 1, 2, 0, 0,
-        0, 0, 1, 6, 3, 0, 2, 2, 0, 0, 1, 1, 1, 12, 2, 0,
-        2, 0, 1, 0, 3, 0, 2, 2, 3, 0, 1, 1, 3, 3, 13, 1,
-        0, 0, 1, 0, 3, 2, 2, 2, 0, 6, 0, 0, 1, 8, 11, 15,
-    };*/
+	sf::Texture texture; 
+    sf::Sprite tiles; 
 
-    // create the tilemap from the level definition
-    TileMap map;
-    if (!map.load("items.png", sf::Vector2u(32, 32), level, MAXHEIGHT, MAXWIDTH))
-        return -1;
-
+	if(!texture.loadFromFile("items.png"))
+        std::cout << "could not locate the specified file" << std::endl; 
+	else
+        tiles.setTexture(texture);
+ 
     // run the main loop
     while (window.isOpen())
     {
@@ -45,12 +36,44 @@ int gameWindow()
         while (window.pollEvent(event))
         {
             if(event.type == sf::Event::Closed)
-                window.close();
+                window.close();	
         }
-
+		if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
+		{
+            int coordX = event.mouseButton.x;
+			int coordY = event.mouseButton.y;
+			//std::cout << coordX << std::endl;
+			for (int j=0; j<MAXHEIGHT; j++)
+			{
+				for (int i=0; i<MAXWIDTH; i++)
+				{	
+					if ( coordX > i*32 && coordX < (i+1)*32 && coordY > j*32 && coordY < (j+1)*32 )
+					{
+						//std::cout << "hay colision en " << "x: " << i <<" y: " << j << std::endl;
+						if (mapaActual->celdaVisible(i,j) && mapaActual->celdaPermitida(i,j))
+							mapaActual->setAire(i,j);
+						if (coordX > WINDOWWIDTH - 20)
+							mapaActual = new Map(0);
+					}
+				}			
+			}
+		}
         // draw the map
         window.clear(sf::Color::White);
-        window.draw(map);
+		//Voy a intentar crear mi propio renderer
+
+		//recorro todo el mapa1
+		for (int j=0; j<MAXHEIGHT; j++)
+		{
+			for (int i=0; i<MAXWIDTH; i++)
+			{				
+				tiles.setPosition(i*32,j*32);
+				tiles.setTextureRect(sf::IntRect(32*(mapaActual->getCeldaTexturePos(i,j)).x,32*(mapaActual->getCeldaTexturePos(i,j)).y, 32, 32));
+				if (mapaActual->celdaVisible(i,j))
+					window.draw(tiles);
+			}			
+		}
+
         window.display();
     }
 

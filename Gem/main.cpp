@@ -6,4 +6,5 @@ int main()
 	load();
 	print_map();
 	gameWindow();
+	
 }
