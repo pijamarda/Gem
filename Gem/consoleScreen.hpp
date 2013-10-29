@@ -3,7 +3,7 @@
 
 void print_map()
 {
-	Map* mapa = new Map();
+	Map* mapa = new Map(0);
 	std::string linea;	
 	
 	for (int j=0; j<MAXHEIGHT; j++)

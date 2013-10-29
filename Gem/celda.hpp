@@ -22,12 +22,16 @@ class Celda
 };
 
 //Este es el constructor estandar, que construye cualquier tipo de material salvo los ESPECIALES
+//en este caso en particular consideramos especiales los 2 primeros
 Celda::Celda()
 {
 	int num = 0;
 	//while ((num = rand() % (MAXMATERIALES-ESPECIALESMAT) + ESPECIALESMAT) == 6)
 	num = rand() % (MAXMATERIALES-ESPECIALESMAT) + ESPECIALESMAT;
-	while (num == 6)
+	//Ademas descartamos la salida ey el caracter especial negro
+	//el material 6 es el negro
+	//el material 15 es la salida
+	while (num == 6 || num == 15)
 		num = rand() % (MAXMATERIALES-ESPECIALESMAT) + ESPECIALESMAT;
 	material = num;
 	visible = true;
