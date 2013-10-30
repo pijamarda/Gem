@@ -1,32 +1,59 @@
 #include<SFML/Graphics.hpp> 
 
+//Al lanzar la aplicacion es el primer nivel que vamos a crear
+//inmediatamente lo asignamos a mapaActual
 Map* mapa0;
+//Del segundo nivel en adelante el mapa se guarda directamente en mapaActual, de manera que no mantenemos los anteriores
+//aunque en un futuro podriamos mantenerlos
 Map* mapaActual;
 int gridSeleccion[MAXWIDTH][MAXHEIGHT];
 bool pulsado=false;
 bool aMinar = false;
 
-int ruloX=0;
-int ruloY=0;
+int ultX=0;
+int ultY=0;
 
+//Esta variable controla que cuando se pulsa una vez, la variable seleccionCursor solo cambia una vez
+//y mientras mantenga pulsado el raton este cambio es mantenido. 
+//una vez que se suelta, cuando se vuelva a pinchar seleccionCursor tomara el 
+//nuevo valor que se mantendra mientras se mantenga la pulsacion
+bool semaforoStop = false;
+//Controla que cuando se esta haciendo una "seleccion" de elementos a minar si se pasa por encima de elementos
+//ya seleccionados no los deseleccione mientras se mantenga la pulsacion
+bool seleccionCursor = true;
+
+//Controla la velocidad con la que se actualizan los distintos elementos
 float frameCounter = 0, switchFrame = 100, frameSpeed = 500;
 sf::Clock reloj;
 
+//realiza la accion de minar, es un bucle que pasa por todas las celdas del juego, e intenta minarlas todas,
+//la manera principal con la que se controla es con "gridSeleccion" que mantiene cuales son las celdas seleccionadas
+//para ser minadas
 int minar()
 {
-	for (int ruloX=0; ruloX < MAXWIDTH; ruloX++)
-		for (int ruloY=0; ruloY < MAXHEIGHT; ruloY++)
-			if (mapaActual->celdaVisible(ruloX,ruloY) && mapaActual->celdaPermitida(ruloX,ruloY) && gridSeleccion[ruloX][ruloY] == 1)
-			{
-				//sf::sleep(sf::milliseconds(1));
-				if (mapaActual->getCeldaID(ruloX,ruloY)!=15)
-					mapaActual->setAire(ruloX,ruloY);
-				gridSeleccion[ruloX][ruloY]=0;				
+	for (int i=0; i < MAXWIDTH; i++)
+		for (int j=0; j < MAXHEIGHT; j++)
+			//si la celda esta pegada a una celda aire, y es una celda que puede ser minada (ahora mismo solo comprueba
+			//que no es uno de los bordos, como vemos dentro de la funcion se hace el check de tipo de celda MAL)
+			if (mapaActual->celdaVisible(i,j) && mapaActual->celdaPermitida(i,j) && gridSeleccion[i][j] == 1)
+			{	
+				//TODO: Hay que cambiar la comprobacion del tipo de celda y sacarla de aqui. Aunque la ventaja de tenerlo
+				//aqui es que permitimos quitar la seleccion automaticamente de las celdas en las que no permitimos minar
+				//TODO: sacar la comprobacion de celdaPermitida del IF exterior y crear un nuevo IF interior, para que
+				//si no dejamos minar quitemos la seleccion
+				//No dejamos minar la celda 15 que es la de salida
+
+				if (mapaActual->getCeldaID(i,j)!=15)
+					mapaActual->setAire(i,j);
+				//una vez que hemos minado quitamos la seleccion 
+				gridSeleccion[i][j]=0;				
 				return 0;
 			}
 	return 0;
 }
 
+//Ponemos todas las variables "globales" a un estado inicial de manera que no se tranfieran entre el cambio de mapas
+//e inicializamos lo que haga falta
 int resetMap()
 {
 	for (int i=0; i<MAXWIDTH; i++)
@@ -37,57 +64,54 @@ int resetMap()
 	return 0;
 }
 
+//funcion principal, es llamada desde el proceso main, en un futuro sera llamada desde un menu
 int gameWindow()
 {
-    // create the window
+    //funcion de creacion de la pantalla principal, las variables globales vienen siempre de constantes.hpp
     sf::RenderWindow window(sf::VideoMode(WINDOWWIDTH, WINDOWHEIGHT), "Tilemap");
 
-	
-	for (int i=0; i<MAXWIDTH; i++)
-		for (int j=0; j<MAXHEIGHT; j++)
-			gridSeleccion[i][j] = 0;
+	//limpiamos el mapa e inicializamos las variables que hagan falta
+	resetMap();
 
+	//creamos el primer nivel y lo asignamos directamente al gestor de mapas
 	mapa0 = new Map(0);
 	mapaActual=mapa0;
 
-	int level1[MAXWIDTH][MAXHEIGHT];
-
-	int contador = 0;
-	for (int j=0; j<MAXHEIGHT; j++)
-	{
-		for (int i=0; i<MAXWIDTH; i++)
-		{			
-			level1[i][j] = mapaActual->getCeldaID(i,j);
-		}
-	}
 	sf::Texture texture; 
     sf::Sprite tiles; 
 
 	if(!texture.loadFromFile("items.png"))
-        std::cout << "could not locate the specified file" << std::endl; 
+        std::cout << "No se encuentra el fichero de texturas" << std::endl; 
 	else
         tiles.setTexture(texture);
  
+	//definicion del cursor de seleccion
 	sf::RectangleShape cursor(sf::Vector2f(26, 26));
 	cursor.setOutlineColor(sf::Color::Red);
 	cursor.setOutlineThickness(3.0f);
 	cursor.setPosition(3,3);	
 	cursor.setFillColor(sf::Color::Transparent);
 
-    // run the main loop
+    //bucle principal, que se mantiene mientras tengamos la ventana abierta
     while (window.isOpen())
     {
-        // handle events
+        // Gestionamos los eventos tipo input de usuario
         sf::Event event;
         while (window.pollEvent(event))
         {
             if(event.type == sf::Event::Closed)
                 window.close();	
-
+			
 			if(event.type == sf::Event::MouseButtonPressed)
 			{
 				if (event.mouseButton.button == sf::Mouse::Left)
-					pulsado = true;
+				{
+					pulsado = true;					
+				}
+				//Ahora mismo el boton derecho funciona como Toggle, es decir que se pulsa una vez para minar
+				//y se pulsa otra vez para dejar de minar
+				//TODO: Revisar el comportamiento para ver como realizar la accion de minar, si debe ser dependiente
+				// de la pulsacion del boton derecho o no
 				if (event.mouseButton.button == sf::Mouse::Right)
 				{
 					if (aMinar)
@@ -99,11 +123,10 @@ int gameWindow()
 			if(event.type == sf::Event::MouseButtonReleased)
 			{
 				if (event.mouseButton.button == sf::Mouse::Left)
-					pulsado = false;
-				if (event.mouseButton.button == sf::Mouse::Right)
 				{
-					//aMinar = false;
-				}
+					pulsado = false;
+					semaforoStop = false;
+				}				
 			}
 
 			if(event.type == sf::Event::MouseMoved || event.type == sf::Event::MouseButtonPressed)
@@ -121,22 +144,53 @@ int gameWindow()
 					coordY = event.mouseButton.y;
 				}
 				//std::cout << coordX << " " << coordY << std::endl;
+				
 				for (int j=0; j<MAXHEIGHT; j++)
 				{
 					for (int i=0; i<MAXWIDTH; i++)
 					{	
+						
 						if ( coordX > i*32 && coordX < (i+1)*32 && coordY > j*32 && coordY < (j+1)*32 )
 						{
 							//std::cout << "hay colision en " << "x: " << i <<" y: " << j << std::endl;
+							std::cout<< "i "<<i << " j " <<j << " ultX " << ultX << " ultY " << ultY<< std::endl;
 							cursor.setPosition(i*32+3,j*32+3);
 							if (pulsado)
 							{	
 								
 								if (mapaActual->celdaPermitida(i,j) && mapaActual->getCeldaID(i,j) != 1 )
-								{
-									gridSeleccion[i][j] = 1;
+								{	
+									
+									if (ultX != i || ultY !=j)
+									{
+										ultX=i;
+										ultY=j;
+										if (!semaforoStop)
+										{
+											semaforoStop = true;
+											if (gridSeleccion[i][j] == 1)
+												seleccionCursor = false;
+											else seleccionCursor = true;
+										}
+										if (gridSeleccion[i][j] == 0 && seleccionCursor)
+										{
+																						
+											gridSeleccion[i][j] = 1;											
+										}
+										else if (gridSeleccion[i][j] == 1 && !seleccionCursor)
+										{
+											gridSeleccion[i][j] = 0;	
+										}
+									}
+									else
+									{
+										ultX=i;
+										ultY=j;
+										//gridSeleccion[i][j] = 0;
+									}
+									
 								}
-								else gridSeleccion[i][j] = 0;
+								
 								//std::cout << "hay colision en " << "x: " << i <<" y: " << j << std::endl;
 								if (mapaActual->celdaVisible(i,j) && mapaActual->celdaPermitida(i,j) && mapaActual->getCeldaID(i,j) == 15)
 								{
@@ -159,7 +213,7 @@ int gameWindow()
 		//std::cout <<  frameCounter << std::endl;
 		if (aMinar && (frameCounter >= switchFrame))
 		{	
-			//std::cout << gridSeleccion[ruloX][ruloY] << std::endl;
+			//std::cout << gridSeleccion[i][j] << std::endl;
 			minar();	
 			frameCounter = 0;
 		}
@@ -198,5 +252,7 @@ int gameWindow()
         window.display();
     }
     return 0;
+
+	
 }
 

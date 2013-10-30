@@ -181,6 +181,8 @@ void Map::setAire(int x, int y)
 	grid[x][y]->setAire();
 }
 
+//por ahora solo comprobamos los bordes del mapa a nivel posicion y no a nivel material
+//TODO: añadir en este metodo cuales son los materiales que no son permitidos
 bool Map::celdaPermitida(int x,int y)
 {
 	bool permitida = false;
