@@ -13,6 +13,7 @@ class Celda
 		int posTy;
 		Celda();
 		Celda(int n);
+		Celda(bool b,int nivel);
 		std::string getMaterial();
 		int getMaterialID();
 		int getMaterialTPx();
@@ -42,6 +43,27 @@ Celda::Celda(int n)
 {
 	//n=1 querra decir aire y n=0 muro	
 	material = n;
+}
+
+//Una primera aproximacion que se me ha ocurrido para la construccion de niveles con materiales segun
+//vamos bajando seria que cuando pasamos al constructor 2 parametros, el segundo le indica en que nivel estamos
+Celda::Celda(bool b,int nivel)
+{	
+	//Ahora deberemos generar un nivel, con elementos que nunca superen el nivel básico que marca el nivel
+	//TODO: muy burdo puesto que en el nivel 0 solo habra arena, en el segundo arena y piedras etc.
+	//pero es una primera aproximacion
+	int num = 0;
+	//TODO: No es muy elegante pero de esta manera no se general los materiales especiales, que en principio
+	//estarian en las primeras posiciones del tileset y de la estructura elementos
+	//se puede ver que no funciona bien ya que mas abajo tambien hay que descartar los elementos 6 y 15
+	num = rand() % (MAXMATERIALES-ESPECIALESMAT) + ESPECIALESMAT;
+	//Ademas descartamos la salida ey el caracter especial negro
+	//el material 6 es el negro
+	//el material 15 es la salida
+	while (num == 6 || num == 15 || num > nivel + 2)
+		num = rand() % (MAXMATERIALES-ESPECIALESMAT) + ESPECIALESMAT;
+	material = num;
+	visible = true;
 }
 
 std::string Celda::getMaterial()

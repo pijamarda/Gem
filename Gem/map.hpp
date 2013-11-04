@@ -9,17 +9,23 @@ Este es el mapa, se construye como un VECTOR en 2D de punteros a objectos Celda
 
 class Map
 {
-	private:		
+	private:
+		//---VARIABLES---
 		std::vector< std::vector<Celda*> > grid;
+
 	public:
-		//Map();		
-		Map(int nivel);				
+		//Map();	
+		//--CONSTRUCT--
+		Map(int nivel);
+
+		//---METODOS----
 		std::string getCeldaStr(int posX, int posY);
 		int getCeldaID(int posX, int posY);
 		sf::Vector2i getCeldaTexturePos(int posX, int posY);
 		bool celdaVisible(int x, int y);
 		void setAire(int x, int y);
 		bool celdaPermitida(int x,int y);
+		bool minar(int,int);
 };
 
 
@@ -46,25 +52,30 @@ Map::Map(int level)
 		{
 			//en x calculamos el porcentaje que queremos con materiales
 			int x = (int)(MAXHEIGHT * PORHEIGHT);
-
-			//esto marca el borde del mapa, a la izquierda, a la derecho y abajo hay rocas, para esto
-			//utilizamos el constructor AD-HOC pasandole el material MURO, ID=0
+			
 			if (level==0)
 			{
+				//esto marca el borde del mapa, a la izquierda, a la derecho y abajo hay rocas, para esto
+				//utilizamos el constructor AD-HOC pasandole el material MURO, ID=0
 				if (i == 0 || i == MAXWIDTH-1 || j == MAXHEIGHT-1)
 					grid[i][j] = new Celda(0);
 				//Llenamos de aire (ID=1) un 20% de la parte superior del mapa
 				else if (j < MAXHEIGHT - x)
 					grid[i][j] = new Celda(1);
+				//hacemos que justamente la siguiente capa al aire sea arena
 				else if (j == MAXHEIGHT - x)
 					grid[i][j] = new Celda(2);
+				//Ahora colocamos la salida, la colocacion la hemos decidido mas arriba
 				else if (i==salidaX && j==salidaY && !finalColocado)
 				{
 					grid[i][j] = new Celda(15);
 					finalColocado = true;
 				}
+				//por último rellenamos el resto de celdas
+				//TODO: Aqui deberiamos indicar de alguna forma que casi todos los elementos que colocamos
+				//deben ser arena
 				else
-					grid[i][j] = new Celda();
+					grid[i][j] = new Celda(true,level);
 			}
 			else
 			{
@@ -82,48 +93,11 @@ Map::Map(int level)
 					finalColocado = true;
 				}
 				else
-					grid[i][j] = new Celda();
-			}
-			//vamos a intentar colocar la salida de nivel
-			//OJO porque no nos aseguramos de que se ha colocado el final, pero bueno
-			
-			//el resto de celdas se compone de el resto de materiales, sin contar los especiales
-		
+					grid[i][j] = new Celda(true, level);
+			}		
 		}
 	}
 }
-
-/*Map::Map(int nivel)
-{
-	//Primero hacemos que el vector tenga un tamaño MAXWIDTH De ancho
-	grid.resize(MAXWIDTH);
-	for (int i=0; i< MAXWIDTH; i++)
-		//por cada uno de los valores de X creamos un vector de tamaño MAXHEIGHT de alto
-		grid[i].resize(MAXHEIGHT);
-
-	for (int j=0; j<MAXHEIGHT; j++)
-	{
-		for (int i=0; i<MAXWIDTH; i++)
-		{
-			//en x calculamos el porcentaje que queremos con materiales
-			int x = (int)(MAXHEIGHT * PORHEIGHT);
-
-			//esto marca el borde del mapa, a la izquierda, a la derecho arriba y abajo hay rocas, para esto
-			//utilizamos el constructor AD-HOC pasandole el material MURO, ID=0
-			if (i == 0 || i == MAXWIDTH-1 || j == 0 || j == MAXHEIGHT-1)
-				grid[i][j] = new Celda(0);
-			//Llenamos de aire (ID=1) un 20% de la parte superior del mapa
-			else if (j < 2)
-				grid[i][j] = new Celda(1);
-			//forzamos que la siguiente linea al aire sea siempre arena
-			else if (j == 2)
-				grid[i][j] = new Celda(2);
-			//el resto de celdas se compone de el resto de materiales, sin contar los especiales
-			else
-				grid[i][j] = new Celda();
-		}
-	}
-}*/
 
 //funcion que devuelve el tipo de celda por posicion, devuelve una cadena de texto simple
 //se utiliza principalmente como DEBUG para la version de consola
@@ -132,12 +106,14 @@ std::string Map::getCeldaStr(int posX, int posY)
 	return grid[posX][posY]->getMaterial();	
 }
 
+//Devuelve el identificador de celda
 int Map::getCeldaID(int posX, int posY)
 {
 	if (posY == 16)
 		std::cout << std::endl;
 	return grid[posX][posY]->getMaterialID();
 }
+
 
 sf::Vector2i Map::getCeldaTexturePos(int posX, int posY)
 {
@@ -191,5 +167,33 @@ bool Map::celdaPermitida(int x,int y)
 		permitida = true;
 	}
 	return permitida;
+}
+
+//realiza la accion de minar, es un bucle que pasa por todas las celdas del juego, e intenta minarlas todas,
+//la manera principal con la que se controla es con "gridSeleccion" que mantiene cuales son las celdas seleccionadas
+//para ser minadas
+bool Map::minar(int x, int y )
+{
+	
+	//si la celda esta pegada a una celda aire, y es una celda que puede ser minada (ahora mismo solo comprueba
+	//que no es uno de los bordos, como vemos dentro de la funcion se hace el check de tipo de celda MAL)
+	if (this->celdaVisible(x,y) && this->celdaPermitida(x,y) )
+	{	
+		//TODO: Hay que cambiar la comprobacion del tipo de celda y sacarla de aqui. Aunque la ventaja de tenerlo
+		//aqui es que permitimos quitar la seleccion automaticamente de las celdas en las que no permitimos minar
+		//TODO: sacar la comprobacion de celdaPermitida del IF exterior y crear un nuevo IF interior, para que
+		//si no dejamos minar quitemos la seleccion
+		//No dejamos minar la celda 15 que es la de salida
+
+		if (this->getCeldaID(x,y)!=15)
+		{
+
+			this->setAire(x,y);
+		//una vez que hemos minado quitamos la seleccion 
+		//gridSeleccion[i][j]=0;				
+			return true;
+		}
+	}
+	return false;
 }
 

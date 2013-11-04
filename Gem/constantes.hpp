@@ -25,7 +25,8 @@ struct tMat
 	int id;
 	std::string corto;
 	std::string largo;
-	int posT[2];	
+	int posT[2];
+	int dureza;
 };
 
 tMat elementos[MAXMATERIALES];

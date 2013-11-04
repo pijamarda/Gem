@@ -30,6 +30,9 @@
     <ClInclude Include="gameScreen.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="willy.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -38,6 +41,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="terrain.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="willy.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

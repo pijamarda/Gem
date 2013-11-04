@@ -1,9 +1,28 @@
 #include "map.hpp"
 #include <iostream>
 
-void print_map()
+class consoleScreen
 {
-	Map* mapa = new Map(0);
+public:
+	//--VARIABLES--
+	Map *mapa;
+
+	//--METODOS--
+	void consoleScreen::print_map();
+
+	//--CONSTRUCT--
+	consoleScreen(Map*);
+};
+
+consoleScreen::consoleScreen(Map *mapa)
+{
+	this->mapa = mapa;
+	this->print_map();
+}
+
+void consoleScreen::print_map()
+{
+	
 	std::string linea;	
 	
 	for (int j=0; j<MAXHEIGHT; j++)
