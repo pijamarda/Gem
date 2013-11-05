@@ -1,5 +1,6 @@
 #include<SFML/Graphics.hpp> 
 
+
 class gameScreen
 {
 public:
@@ -9,6 +10,11 @@ public:
 	//Del segundo nivel en adelante el mapa se guarda directamente en mapaActual, 
 	//de manera que no mantenemos los anteriores aunque en un futuro podriamos mantenerlos
 	Map* mapaActual;
+
+	int level;
+
+	//jugador
+	Willy *willy;
 
 	int gridSeleccion[MAXWIDTH][MAXHEIGHT];
 	bool pulsado;
@@ -41,26 +47,29 @@ public:
 
 	//------CONSTRUCT----------
 
-	gameScreen(Map*);
-	gameScreen(Map*,consoleScreen*);
+	gameScreen(Map*, Willy*);
+	gameScreen(Map*,consoleScreen*, Willy*);
 };
 
 //funcion principal, es llamada desde el proceso main, en un futuro sera llamada desde un menu
-gameScreen::gameScreen(Map *mapa)
+gameScreen::gameScreen(Map *mapa, Willy *willy)
 {
 	//creamos el primer nivel y lo asignamos directamente al gestor de mapas	
 	this->mapaActual=mapa;
 	hayConsola=false;
+	level=0;
 	init();
 }
 
 //funcion para debug, asi podremos actualizar la salida por consola
-gameScreen::gameScreen(Map *mapa, consoleScreen *consola)
+gameScreen::gameScreen(Map *mapa, consoleScreen *consola, Willy *willy)
 {
 	//creamos el primer nivel y lo asignamos directamente al gestor de mapas	
 	this->mapaActual=mapa;
 	this->consola=consola;
+	this->willy=willy;
 	hayConsola=true;
+	level=0;
 	init();
 }
 
@@ -71,7 +80,7 @@ int gameScreen::minarLoop()
 	for (int i=0; i<MAXWIDTH; i++)
 		for (int j=0; j<MAXHEIGHT; j++)
 			if (gridSeleccion[i][j]==1)
-				if (mapaActual->minar(i,j))
+				if (mapaActual->minar(i,j,willy))
 				{
 					gridSeleccion[i][j] = 0; 
 					return 0;
@@ -237,7 +246,8 @@ void gameScreen::init()
 								{
 									//mapaActual->setAire(i,j);
 									resetMap();	
-									mapaActual = new Map(1);									
+									mapaActual = new Map(++level);
+									consola->setMap(mapaActual);
 								}
 							}
 						}
@@ -260,7 +270,8 @@ void gameScreen::init()
 			//si tenemos activada la consola para el modo debug, actualizamos por pantalla
 			//la ponemos aqui para que no refresque todo el rato
 			//TODO: Revisar y buscar otro sitio para poner la consola por pantalla
-		if (hayConsola) consola->print_map();
+			//DEBUG
+			//if (hayConsola) consola->print_map();
 		}
 
 		if (frameCounter >32000) {frameCounter = 0;}

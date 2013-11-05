@@ -5,7 +5,8 @@ Este es el mapa, se construye como un VECTOR en 2D de punteros a objectos Celda
 #include <string>
 #include <vector>
 #include <iostream>
-#include <SFML/Graphics.hpp> 
+#include <SFML/Graphics.hpp>
+#include "willy.hpp"
 
 class Map
 {
@@ -14,18 +15,20 @@ class Map
 		std::vector< std::vector<Celda*> > grid;
 
 	public:
-		//Map();	
+		//---VARIABLES---//
+		
+		
 		//--CONSTRUCT--
-		Map(int nivel);
+		Map(int);
 
 		//---METODOS----
-		std::string getCeldaStr(int posX, int posY);
-		int getCeldaID(int posX, int posY);
-		sf::Vector2i getCeldaTexturePos(int posX, int posY);
-		bool celdaVisible(int x, int y);
-		void setAire(int x, int y);
-		bool celdaPermitida(int x,int y);
-		bool minar(int,int);
+		std::string getCeldaStr(int, int);
+		int getCeldaID(int, int);
+		sf::Vector2i getCeldaTexturePos(int, int);
+		bool celdaVisible(int, int);
+		void setAire(int, int);
+		bool celdaPermitida(int,int);
+		bool minar(int,int, Willy*);
 };
 
 
@@ -172,7 +175,7 @@ bool Map::celdaPermitida(int x,int y)
 //realiza la accion de minar, es un bucle que pasa por todas las celdas del juego, e intenta minarlas todas,
 //la manera principal con la que se controla es con "gridSeleccion" que mantiene cuales son las celdas seleccionadas
 //para ser minadas
-bool Map::minar(int x, int y )
+bool Map::minar(int x, int y, Willy *willy )
 {
 	
 	//si la celda esta pegada a una celda aire, y es una celda que puede ser minada (ahora mismo solo comprueba
@@ -187,11 +190,21 @@ bool Map::minar(int x, int y )
 
 		if (this->getCeldaID(x,y)!=15)
 		{
-
-			this->setAire(x,y);
+			if (grid[x][y]->getDurabilidad() > 0)
+				grid[x][y]->celdaMinar(x,y);
+			if (grid[x][y]->getDurabilidad() == 0)
+			{
+				int monedas = grid[x][y]->getCoins();
+				//DEBUG
+				std::cout << "Willy gana: " << monedas << std::endl;
+				willy->addCoins(monedas);
+				//DEBUG
+				willy->printInvConsola();
+				this->setAire(x,y);
+				return true;
+			}
 		//una vez que hemos minado quitamos la seleccion 
-		//gridSeleccion[i][j]=0;				
-			return true;
+		//gridSeleccion[i][j]=0;
 		}
 	}
 	return false;

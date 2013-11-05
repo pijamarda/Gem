@@ -7,18 +7,28 @@ Esta clase representa cada una de las celdas de las que se compone el mapa
 class Celda
 {
 	public:		
+		//----VARIABLES----//
 		int material;
 		bool visible;
 		int posTx;
 		int posTy;
+		int durabilidad;
+		int coins;
+
+		//----CONSTRUCT----//
 		Celda();
 		Celda(int n);
 		Celda(bool b,int nivel);
+
+		//---METODOS-----/
 		std::string getMaterial();
 		int getMaterialID();
 		int getMaterialTPx();
 		int getMaterialTPy();
 		void setAire();
+		int getDurabilidad();
+		void celdaMinar(int,int);
+		int getCoins();
 		
 };
 
@@ -43,6 +53,8 @@ Celda::Celda(int n)
 {
 	//n=1 querra decir aire y n=0 muro	
 	material = n;
+	durabilidad = elementos[n].dureza;
+	coins = elementos[n].coins;
 }
 
 //Una primera aproximacion que se me ha ocurrido para la construccion de niveles con materiales segun
@@ -63,6 +75,8 @@ Celda::Celda(bool b,int nivel)
 	while (num == 6 || num == 15 || num > nivel + 2)
 		num = rand() % (MAXMATERIALES-ESPECIALESMAT) + ESPECIALESMAT;
 	material = num;
+	durabilidad = elementos[num].dureza;
+	coins = elementos[num].coins;
 	visible = true;
 }
 
@@ -89,4 +103,20 @@ int Celda::getMaterialTPy()
 void Celda::setAire()
 {
 	this->material = 1;
+}
+
+int Celda::getDurabilidad()
+{
+	return this->durabilidad;
+}
+
+void Celda::celdaMinar(int x,int y)
+{
+	if (durabilidad > 0)
+		durabilidad--;
+}
+
+int Celda::getCoins()
+{
+	return coins;
 }

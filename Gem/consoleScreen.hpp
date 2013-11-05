@@ -4,20 +4,22 @@
 class consoleScreen
 {
 public:
-	//--VARIABLES--
+	//--VARIABLES--//
 	Map *mapa;
+	Willy *willy;
 
-	//--METODOS--
+	//--METODOS---//
 	void consoleScreen::print_map();
+	void setMap(Map*);
 
-	//--CONSTRUCT--
-	consoleScreen(Map*);
+	//--CONSTRUCT--//
+	consoleScreen(Map*, Willy*);
 };
 
-consoleScreen::consoleScreen(Map *mapa)
+consoleScreen::consoleScreen(Map *mapa, Willy *willy)
 {
 	this->mapa = mapa;
-	this->print_map();
+	this->willy = willy;
 }
 
 void consoleScreen::print_map()
@@ -34,6 +36,11 @@ void consoleScreen::print_map()
 		std::cout << linea << std::endl;
 		linea.clear();
 	}
-	int i;
-	//std::cin >> i;
+	//DEBUG
+	//willy->printInvConsola();
+}
+
+void consoleScreen::setMap(Map *mapa)
+{
+	this->mapa=mapa;
 }
