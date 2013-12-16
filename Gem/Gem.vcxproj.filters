@@ -24,18 +24,36 @@
     <ClInclude Include="consoleScreen.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="constantes.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="gameScreen.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="willy.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="constantes.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gameScreen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="consoleScreen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="map.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="celda.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="willy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="constantes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -44,6 +62,9 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="willy.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="items.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

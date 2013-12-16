@@ -1,6 +1,4 @@
-#include "consoleScreen.hpp"
 #include "gameScreen.hpp"
-
 
 int main()
 {
@@ -12,9 +10,11 @@ int main()
 	Willy *willy = new Willy();
 	
 	consoleScreen *consola = new consoleScreen(mapaini,willy);
-	gameScreen *pantalla = new gameScreen(mapaini,consola,willy);
 	consola->print_map();
-	int x;	
-	std::cin >> x;
+	gameScreen *pantalla = new gameScreen(mapaini,consola,willy);
+	int x = 1212;	
+	std::cout << x << std::endl;
+	int salida = std::scanf("%d", &x);
+	
 	
 }
