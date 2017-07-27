@@ -1,6 +1,6 @@
 #include "constantes.hpp"
 
-tMat elementos[MAXMATERIALES];
+//tMat elementos[MAXMATERIALES];
 
 void load()
 {

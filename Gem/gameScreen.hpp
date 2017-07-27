@@ -40,9 +40,9 @@ public:
 
 	//------METODOS------------
 
-	int gameScreen::minarLoop();
-	int gameScreen::resetMap();
-	void gameScreen::init();
+	int minarLoop();
+	int resetMap();
+	void init();
 
 	//------CONSTRUCT----------
 
