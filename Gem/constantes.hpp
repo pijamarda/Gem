@@ -42,4 +42,4 @@ int postx(int n);
 //Devuelve la posicion y dentro del fichero de texturas
 int posty(int n);
 
-tMat elementos[MAXMATERIALES];
+static tMat elementos[MAXMATERIALES];

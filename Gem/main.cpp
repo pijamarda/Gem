@@ -14,7 +14,5 @@ int main()
 	gameScreen *pantalla = new gameScreen(mapaini,consola,willy);
 	int x = 1212;	
 	std::cout << x << std::endl;
-	int salida = std::scanf("%d", &x);
-	
-	
+	//int salida = std::scanf("%d", &x);	
 }
